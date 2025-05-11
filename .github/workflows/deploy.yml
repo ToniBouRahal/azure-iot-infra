@@ -29,7 +29,15 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDS }}
-
+          
+      - name: Deploy core infrastructure
+        run: |
+          az deployment group create \
+            --resource-group $RESOURCE_GROUP \
+            --template-file main.bicep \
+            --parameters parameters/dev.parameters.json \
+              twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
+              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" 
       - name: Create Key Vault secrets if missing (placeholders)
         run: |
           create_secret() {
@@ -53,14 +61,6 @@ jobs:
           create_secret twilioToNumber "+96171650378"
           create_secret logicAppEndpoint PLACEHOLDER
 
-      - name: Deploy core infrastructure
-        run: |
-          az deployment group create \
-            --resource-group $RESOURCE_GROUP \
-            --template-file main.bicep \
-            --parameters parameters/dev.parameters.json \
-              twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
-              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" 
 
   stage2-patch-and-redeploy:
     name: Stage 2 - Patch Secrets and Redeploy
