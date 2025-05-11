@@ -10,10 +10,10 @@ jobs:
     name: Stage 1 - Deploy Core Infra
     runs-on: ubuntu-latest
     env:
-      RESOURCE_GROUP: rg-iot-dev
-      KV_NAME: kv-dev-iot
-      IOT_HUB_NAME: iothub-dev-001
-      EVENTHUB_NAMESPACE: eh-dev-iot
+      RESOURCE_GROUP: rg-iot-dev-002
+      KV_NAME: kv-dev-iot-003
+      IOT_HUB_NAME: iothub-dev-002
+      EVENTHUB_NAMESPACE: eh-dev-iot-002
       LOCATION: northeurope
 
     steps:
@@ -64,13 +64,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: stage1-infra
     env:
-      RESOURCE_GROUP: rg-iot-dev
-      KV_NAME: kv-dev-iot
-      IOT_HUB_NAME: iothub-dev-001
-      EVENTHUB_NAMESPACE: eh-dev-iot
+      RESOURCE_GROUP: rg-iot-dev-002
+      KV_NAME: kv-dev-iot-003
+      IOT_HUB_NAME: iothub-dev-002
+      EVENTHUB_NAMESPACE: eh-dev-iot-002
       LOCATION: northeurope
-      LOGICAPP_NAME: la-dev-alerts
-      FUNCTIONAPP_NAME: func-dev-alerts
+      LOGICAPP_NAME: la-dev-alerts-002
+      FUNCTIONAPP_NAME: func-dev-alerts-001
 
     steps:
       - name: Checkout repository
@@ -109,7 +109,7 @@ jobs:
 
           LOGICAPP_ENDPOINT=$( az rest \
                               --method post \
-                              --uri "https://management.azure.com/subscriptions/cb539bcf-279e-45b6-8d4e-64059fb28811/resourceGroups/rg-iot-dev/providers/Microsoft.Logic/workflows/la-dev-alerts/triggers/manualTrigger/listCallbackUrl?api-version=2016-06-01" \
+                              --uri "https://management.azure.com/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Logic/workflows/la-dev-alerts/triggers/manualTrigger/listCallbackUrl?api-version=2016-06-01" \
                               --query "value" -o tsv)
           
           
