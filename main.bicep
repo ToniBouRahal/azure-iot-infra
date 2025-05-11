@@ -28,19 +28,19 @@ param iotHubAccessKey string
 @secure()
 param eventHubAccessKey string
 
-param keyVaultName string = 'kv-${environment}-iot-002'
-param iotHubName string = 'iothub-${environment}-001'
-param eventHubNamespaceName string = 'eh-${environment}-iot'
+param keyVaultName string = 'kv-${environment}-iot-003'
+param iotHubName string = 'iothub-${environment}-002'
+param eventHubNamespaceName string = 'eh-${environment}-iot-002'
 param eventHubName string = 'telemetry-events'
-param streamJobName string = 'sa-${environment}-job'
-param sqlServerName string = 'sql-${environment}-iot'
+param streamJobName string = 'sa-${environment}-job-002'
+param sqlServerName string = 'sql-${environment}-iot-002'
 param sqlDbName string = 'iotdb'
 param sqlAdminUsername string = 'sqladmin'
-param logicAppName string = 'la-${environment}-alerts'
-param functionAppName string = 'func-${environment}-alerts'
-param storageAccountName string = 'iotfunc${environment}storage'
-param appServicePlanName string = 'webapp-plan-${environment}'
-param webAppName string = 'iotweb-${environment}'
+param logicAppName string = 'la-${environment}-alerts-002'
+param functionAppName string = 'func-${environment}-alerts-002'
+param storageAccountName string = 'iotfunc${environment}storage-002'
+param appServicePlanName string = 'webapp-plan-${environment}-002'
+param webAppName string = 'iotweb-${environment}-002'
 param eventHubConsumerGroup string = 'functioncg'
 
 
