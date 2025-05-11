@@ -46,67 +46,67 @@ param eventHubConsumerGroup string = 'functioncg'
 
 
 
-// module keyvault 'modules/keyvault.bicep' = {
-//   name: 'keyvault-deploy'
-//   params: {
-//     location: location
-//     name: keyVaultName
-//     environment: environment
-//   }
-// }
+module keyvault 'modules/keyvault.bicep' = {
+  name: 'keyvault-deploy'
+  params: {
+    location: location
+    name: keyVaultName
+    environment: environment
+  }
+}
 
-// module iothub 'modules/iothub.bicep' = {
-//   name: 'iothub-deploy'
-//   params: {
-//     name: iotHubName
-//     location: location
-//   }
-// }
+module iothub 'modules/iothub.bicep' = {
+  name: 'iothub-deploy'
+  params: {
+    name: iotHubName
+    location: location
+  }
+}
 
-// module eventhub 'modules/eventhub.bicep' = {
-//   name: 'eventhub-deploy'
-//   params: {
-//     name: eventHubNamespaceName
-//     location: location
-//     eventHubName: eventHubName
-//     consumerGroupName: eventHubConsumerGroup
-//   }
-// }
-//
-// module streamanalytics 'modules/streamanalytics.bicep' = {
-//   name: 'streamanalytics-deploy'
-//   params: {
-//     name: streamJobName
-//     location: location
-//     iotHubAccessKey: iotHubAccessKey
-//     iotHubNamespace: iotHubName
-//     eventHubAccessKey: eventHubAccessKey
-//     serviceBusNamespace: eventhub.outputs.eventHubNamespaceName
-//     eventHubName: eventHubName
-//     sqlAdminPassword: sqlAdminPassword
-//   }
-// }
-//
-// module sql 'modules/sql.bicep' = {
-//   name: 'sqldb-deploy'
-//   params: {
-//     location: location
-//     sqlServerName: sqlServerName
-//     sqlDbName: sqlDbName
-//     adminUsername: sqlAdminUsername
-//     adminPassword: sqlAdminPassword
-//   }
-// }
-//
-// module logicapp 'modules/logicapp.bicep' = {
-//   name: 'logicapp-deploy'
-//   params: {
-//     name: logicAppName
-//     twilioAccountSid: twilioAccountSid
-//     twilioAuthToken: twilioAuthToken
-//     location: location
-//   }
-// }
+module eventhub 'modules/eventhub.bicep' = {
+  name: 'eventhub-deploy'
+  params: {
+    name: eventHubNamespaceName
+    location: location
+    eventHubName: eventHubName
+    consumerGroupName: eventHubConsumerGroup
+  }
+}
+
+module streamanalytics 'modules/streamanalytics.bicep' = {
+  name: 'streamanalytics-deploy'
+  params: {
+    name: streamJobName
+    location: location
+    iotHubAccessKey: iotHubAccessKey
+    iotHubNamespace: iotHubName
+    eventHubAccessKey: eventHubAccessKey
+    serviceBusNamespace: eventhub.outputs.eventHubNamespaceName
+    eventHubName: eventHubName
+    sqlAdminPassword: sqlAdminPassword
+  }
+}
+
+module sql 'modules/sql.bicep' = {
+  name: 'sqldb-deploy'
+  params: {
+    location: location
+    sqlServerName: sqlServerName
+    sqlDbName: sqlDbName
+    adminUsername: sqlAdminUsername
+    adminPassword: sqlAdminPassword
+  }
+}
+
+module logicapp 'modules/logicapp.bicep' = {
+  name: 'logicapp-deploy'
+  params: {
+    name: logicAppName
+    twilioAccountSid: twilioAccountSid
+    twilioAuthToken: twilioAuthToken
+    location: location
+  }
+}
 
 module function 'modules/function.bicep' = {
   name: 'functionapp-deploy'
@@ -121,13 +121,13 @@ module function 'modules/function.bicep' = {
   }
 }
 //
-// module webapp 'modules/appservice.bicep' = {
-//   name: 'webapp-deploy'
-//   params: {
-//     location: location
-//     appServicePlanName: appServicePlanName
-//     webAppName: webAppName
-//     environment: environment
-//     keyVaultName: keyVaultName
-//   }
-// }
+module webapp 'modules/appservice.bicep' = {
+   name: 'webapp-deploy'
+   params: {
+     location: location
+     appServicePlanName: appServicePlanName
+     webAppName: webAppName
+     environment: environment
+     keyVaultName: keyVaultName
+   }
+ }
