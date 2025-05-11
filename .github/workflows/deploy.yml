@@ -30,6 +30,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDS }}
           
+      - name: Ensure resource group exists
+        run: |
+          echo "Ensuring resource group $RESOURCE_GROUP exists..."
+          az group show --name $RESOURCE_GROUP >/dev/null 2>&1 || \
+          az group create --name $RESOURCE_GROUP --location $LOCATION
       - name: Deploy core infrastructure
         run: |
           az deployment group create \
