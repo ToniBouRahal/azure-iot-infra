@@ -1,6 +1,7 @@
 # 🚀 Azure IoT Infrastructure (Bicep + CI/CD)
 
-![Architecture Diagram](https://raw.githubusercontent.com/your-org/infra/main/docs/architecture.png)
+![image](https://github.com/user-attachments/assets/0b6322e3-a819-4405-9f1c-bb04828cf5e6)
+
 
 This repo defines the complete Azure infrastructure for an IoT solution using **Bicep templates** and **GitHub Actions**.
 
