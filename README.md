@@ -162,7 +162,6 @@ infra/
 - App Services and Logic Apps use **Key Vault references** for secrets
 - The Azure Function is triggered by Event Hub and calls the Logic App via HTTP POST
 - Logic App sends Twilio SMS alerts on triggered events
-
 ---
 
 ## 🔗 Related Repositories
