@@ -1,5 +1,10 @@
 name: Two-Stage Infra Deployment
 
+permissions:
+  id-token: write
+  contents: read
+
+
 on:
   push:
     branches:
