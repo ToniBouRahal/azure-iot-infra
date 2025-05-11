@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "value": "dev"
+    },
+    "iotHubConnectionString": {
+      "value": "PLACEHOLDER"  // Replaced post-deployment via CLI
+    },
+    "eventHubConnectionString": {
+      "value": "PLACEHOLDER"  // Replaced post-deployment via CLI
+    },
+    "sqlAdminPassword": {
+      "value": "ljlafoj234%ZA"  // Can be generated or stored in Key Vault
+    },
+    "sqlConnectionString": {
+      "value": "PLACEHOLDER"  // Composed dynamically in CI/CD
+    },
+    "logicAppEndpoint": {
+      "value": "PLACEHOLDER"  // Set after Logic App trigger is deployed
+    },
+    "iotHubAccessKey": {
+      "value": "PLACEHOLDER"  // Set after IoT Hub is deployed
+    },
+    "eventHubAccessKey": {
+      "value": "PLACEHOLDER"  // Set after Event Hub is deployed
+    },
+    "twilioAccountSid": {
+      "value": "PLACEHOLDER"  // Set after Twilio is deployed
+    },
+    "twilioAuthToken": {
+      "value": "PLACEHOLDER"  // Set after Twilio is deployed
+    }
+  }
+}

@@ -1,0 +1,158 @@
+name: Two-Stage Infra Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  stage1-infra:
+    name: Stage 1 - Deploy Core Infra
+    runs-on: ubuntu-latest
+    env:
+      RESOURCE_GROUP: rg-iot-dev
+      KV_NAME: kv-dev-iot
+      IOT_HUB_NAME: iothub-dev-001
+      EVENTHUB_NAMESPACE: eh-dev-iot
+      LOCATION: northeurope
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create Key Vault secrets if missing (placeholders)
+        run: |
+          create_secret() {
+            NAME=$1
+            VALUE=$2
+            EXISTS=$(az keyvault secret show --vault-name $KV_NAME --name $NAME --query id -o tsv 2>/dev/null || true)
+            if [[ -z "$EXISTS" ]]; then
+              echo "Creating placeholder secret: $NAME"
+              az keyvault secret set --vault-name $KV_NAME --name $NAME --value "$VALUE"
+            fi
+          }
+
+          create_secret iotHubConnectionString PLACEHOLDER
+          create_secret iotHubAccessKey PLACEHOLDER
+          create_secret eventHubConnectionString PLACEHOLDER
+          create_secret eventHubAccessKey PLACEHOLDER
+          create_secret sqlAdminPassword $(openssl rand -base64 16)
+          create_secret twilioAccountSid ${{ secrets.TWILIO_ACCOUNT_SID }}
+          create_secret twilioAuthToken  ${{ secrets.TWILIO_AUTH_TOKEN }}
+          create_secret twilioFromNumber "+19867861925"
+          create_secret twilioToNumber "+96171650378"
+          create_secret logicAppEndpoint PLACEHOLDER
+
+      - name: Deploy core infrastructure
+        run: |
+          az deployment group create \
+            --resource-group $RESOURCE_GROUP \
+            --template-file main.bicep \
+            --parameters parameters/dev.parameters.json \
+              twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
+              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" 
+
+  stage2-patch-and-redeploy:
+    name: Stage 2 - Patch Secrets and Redeploy
+    runs-on: ubuntu-latest
+    needs: stage1-infra
+    env:
+      RESOURCE_GROUP: rg-iot-dev
+      KV_NAME: kv-dev-iot
+      IOT_HUB_NAME: iothub-dev-001
+      EVENTHUB_NAMESPACE: eh-dev-iot
+      LOCATION: northeurope
+      LOGICAPP_NAME: la-dev-alerts
+      FUNCTIONAPP_NAME: func-dev-alerts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Fetch and store real secrets
+        run: |
+          REAL_IOT_CONN=$(az iot hub connection-string show \
+            --hub-name $IOT_HUB_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --query connectionString -o tsv)
+          
+          REAL_IOT_ACCESS_KEY=$(az iot hub connection-string show \
+            --hub-name $IOT_HUB_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --query connectionString -o tsv | awk -F'SharedAccessKdy' '{print $2}')
+
+          REAL_EH_CONN=$(az eventhubs namespace authorization-rule keys list \
+            --resource-group $RESOURCE_GROUP \
+            --namespace-name $EVENTHUB_NAMESPACE \
+            --name RootManageSharedAccessKey \
+            --query primaryConnectionString -o tsv)
+          
+          REAL_EH_ACCESS_KEY=$(az eventhubs namespace authorization-rule keys list \
+            --resource-group $RESOURCE_GROUP \
+            --namespace-name $EVENTHUB_NAMESPACE \
+            --name RootManageSharedAccessKey \
+            --query primaryConnectionString -o tsv | awk -F'SharedAccessKdy' '{print $2}')
+
+          LOGICAPP_ENDPOINT=$( az rest \
+                              --method post \
+                              --uri "https://management.azure.com/subscriptions/cb539bcf-279e-45b6-8d4e-64059fb28811/resourceGroups/rg-iot-dev/providers/Microsoft.Logic/workflows/la-dev-alerts/triggers/manualTrigger/listCallbackUrl?api-version=2016-06-01" \
+                              --query "value" -o tsv)
+          
+          
+
+          az keyvault secret set --vault-name $KV_NAME --name iotHubConnectionString --value "$REAL_IOT_CONN"
+          az keyvault secret set --vault-name $KV_NAME --name iotHubAccessKey --value "$REAL_IOT_ACCESS_KEY"
+          az keyvault secret set --vault-name $KV_NAME --name eventHubConnectionString --value "$REAL_EH_CONN"
+          az keyvault secret set --vault-name $KV_NAME --name eventHubAccessKey --value "$REAL_EH_ACCESS_KEY"
+          az keyvault secret set --vault-name $KV_NAME --name logicAppEndpoint --value "$LOGICAPP_ENDPOINT"
+
+      - name: Get updated secrets from Key Vault
+        run: |
+          echo "IOT_CONN=$(az keyvault secret show --vault-name $KV_NAME --name iotHubConnectionString --query value -o tsv)" >> $GITHUB_ENV
+          echo "IOT_ACCESS_KEY=$(az keyvault secret show --vault-name $KV_NAME --name iotHubAccessKey --query value -o tsv)" >> $GITHUB_ENV
+          echo "EH_CONN=$(az keyvault secret show --vault-name $KV_NAME --name eventHubConnectionString --query value -o tsv)" >> $GITHUB_ENV
+          echo "EH_ACCESS_KEY=$(az keyvault secret show --vault-name $KV_NAME --name eventHubAccessKey --query value -o tsv)" >> $GITHUB_ENV
+          echo "SQL_PASS=$(az keyvault secret show --vault-name $KV_NAME --name sqlAdminPassword --query value -o tsv)" >> $GITHUB_ENV
+          echo "LOGICAPP_ENDPOINT=$(az keyvault secret show --vault-name $KV_NAME --name logicAppEndpoint --query value -o tsv)" >> $GITHUB_ENV
+
+      - name: Final deployment with real secrets
+        run: |
+          az deployment group create \
+            --resource-group $RESOURCE_GROUP \
+            --template-file main.bicep \
+            --parameters parameters/dev.parameters.json \
+              iotHubConnectionString="${{ env.IOT_CONN }}" \
+              iotHubAccessKey="${{ env.IOT_ACCESS_KEY }}" \
+              eventHubConnectionString="${{ env.EH_CONN }}" \
+              eventHubAccessKey="${{ env.EH_ACCESS_KEY }}" \
+              sqlAdminPassword="${{ env.SQL_PASS }}" \
+              sqlConnectionString="Server=tcp:sql-dev-iot.database.windows.net,1433;Initial Catalog=iotdb;User ID=sqladmin;Password=${{ env.SQL_PASS }};Encrypt=true;Connection Timeout=30;" \
+              logicAppEndpoint="${{ env.LOGICAPP_ENDPOINT }}" \
+              twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
+              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" \
+              
+
+      - name: Deploy Azure Function
+        run: |
+          cd function/alert-handler
+          npm install
+          zip -r ../../function.zip .
+          cd -
+          az functionapp deployment source config-zip \
+            --resource-group $RESOURCE_GROUP \
+            --name $FUNCTIONAPP_NAME \
+            --src function.zip

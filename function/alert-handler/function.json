@@ -1,0 +1,11 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "event",
+      "direction": "in",
+      "eventHubName": "%EVENTHUB_NAME%",
+      "EVENTHUB_CONNECTION": "Endpoint=sb://eh-dev-iot.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Adgjqpz+h9kh0uNMHzlpxJA5FIGMyDV1n+AEhGYAYG0="
+    }
+  ]
+}
