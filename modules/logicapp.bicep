@@ -14,7 +14,7 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    definition: json(loadTextContent('../workflow-definition.json'))
+ //   definition: json(loadTextContent('../workflow-definition.json'))
     parameters: {
     }
   }
