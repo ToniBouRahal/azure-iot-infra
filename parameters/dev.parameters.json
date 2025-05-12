@@ -32,5 +32,8 @@
     "twilioAuthToken": {
       "value": "PLACEHOLDER"  // Set after Twilio is deployed
     }
+    "spObjectId": {
+      "value": "PLACEHOLDER" // Set during runtime
+    }
   }
 }
