@@ -158,13 +158,14 @@ jobs:
               spObjectId="${{ secrets.AZURE_SP_OBJECT_ID }}"
               
 
-      - name: Deploy Azure Function
+      - name: Install Azure Functions Core Tools
+        run: |
+          npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+      - name: Publish Azure Function
         run: |
           cd function/alert-handler
-          npm install
-          zip -r ../../function.zip .
-          cd -
-          az functionapp deployment source config-zip \
-            --resource-group $RESOURCE_GROUP \
-            --name $FUNCTIONAPP_NAME \
-            --src function.zip
+          func azure functionapp publish func-dev-alerts \
+          --python \
+          --build-native-deps=false \
+          --force
