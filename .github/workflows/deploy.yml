@@ -100,7 +100,7 @@ jobs:
           REAL_IOT_ACCESS_KEY=$(az iot hub connection-string show \
             --hub-name $IOT_HUB_NAME \
             --resource-group $RESOURCE_GROUP \
-            --query connectionString -o tsv |  awk -F'SharedAccessKey' '{print $3}' | sed 's/^=//'')
+            --query connectionString -o tsv |  awk -F'SharedAccessKey' '{print $3}' | sed 's/^=//')
 
           REAL_EH_CONN=$(az eventhubs namespace authorization-rule keys list \
             --resource-group $RESOURCE_GROUP \
