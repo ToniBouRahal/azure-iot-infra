@@ -28,6 +28,9 @@ param iotHubAccessKey string
 @secure()
 param eventHubAccessKey string
 
+@secure()
+param spObjectId string
+
 param keyVaultName string = 'kv-${environment}-iot-003'
 param iotHubName string = 'iothub-${environment}-002'
 param eventHubNamespaceName string = 'eh-${environment}-iot-002'
@@ -52,6 +55,7 @@ module keyvault 'modules/keyvault.bicep' = {
     location: location
     name: keyVaultName
     environment: environment
+    spObjectId: spObjectId
   }
 }
 
