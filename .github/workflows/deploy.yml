@@ -120,11 +120,15 @@ jobs:
                               --query "value" -o tsv)
           
           
-
+          echo " storing iotHub Connection String"
           az keyvault secret set --vault-name $KV_NAME --name iotHubConnectionString --value "$REAL_IOT_CONN"
+          echo " storing iotHub access Key "
           az keyvault secret set --vault-name $KV_NAME --name iotHubAccessKey --value "$REAL_IOT_ACCESS_KEY"
+          echo " storing eh connection String "
           az keyvault secret set --vault-name $KV_NAME --name eventHubConnectionString --value "$REAL_EH_CONN"
+          echo " storing eh access key "
           az keyvault secret set --vault-name $KV_NAME --name eventHubAccessKey --value "$REAL_EH_ACCESS_KEY"
+          echo " storing logic app endpoint "
           az keyvault secret set --vault-name $KV_NAME --name logicAppEndpoint --value "$LOGICAPP_ENDPOINT"
 
       - name: Get updated secrets from Key Vault
