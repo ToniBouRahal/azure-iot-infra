@@ -42,7 +42,8 @@ jobs:
             --template-file main.bicep \
             --parameters parameters/dev.parameters.json \
               twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
-              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" 
+              twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" \
+              spObjectId="${{ secrets.AZURE_SP_OBJECT_ID }}
       - name: Create Key Vault secrets if missing (placeholders)
         run: |
           create_secret() {
@@ -150,6 +151,7 @@ jobs:
               logicAppEndpoint="${{ env.LOGICAPP_ENDPOINT }}" \
               twilioAccountSid="${{ secrets.TWILIO_ACCOUNT_SID }}" \
               twilioAuthToken="${{ secrets.TWILIO_AUTH_TOKEN }}" \
+              spObjectId="${{ secrets.AZURE_SP_OBJECT_ID }}
               
 
       - name: Deploy Azure Function
