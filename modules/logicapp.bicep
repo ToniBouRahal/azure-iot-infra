@@ -15,7 +15,7 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
   }
   properties: {
  //   definition: json(loadTextContent('../workflow-definition.json'))
-    definiton: {}
+    definition: {}
     parameters: {
     }
   }
