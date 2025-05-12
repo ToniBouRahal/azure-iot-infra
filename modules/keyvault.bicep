@@ -3,7 +3,7 @@ param name string
 param environment string
 
 @secure
-param param spObjectId string
+param spObjectId string
 
 resource kv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: name
