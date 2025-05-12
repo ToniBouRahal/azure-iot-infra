@@ -2,6 +2,9 @@ param location string = resourceGroup().location
 param name string
 param environment string
 
+@secure
+param param spObjectId string
+
 resource kv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: name
   location: location
@@ -14,7 +17,18 @@ resource kv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       family: 'A'
     }
     tenantId: subscription().tenantId
-    accessPolicies: [] // Added later by appservice/function modules
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: spObjectId
+        permissions: {
+          keys: [ 'all' ]
+          secrets: [ 'all' ]
+          certificates: [ 'all' ]
+          storage: [ 'all' ]
+        }
+      }
+    ]
   }
 }
 
